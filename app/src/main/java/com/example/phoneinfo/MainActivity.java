@@ -19,7 +19,6 @@ import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -73,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
                 public void onErrorResponse(VolleyError error) {
                     // TODO: обрабатывать ошибки 404, исходя из сообщения в JSON-поле "info" (неправильный формат номера или номер не найден)
                     // Если сервер вернул ответ с кодом 404, то это не совсем ошибка
-                    // Просто сообщаем, что номер введён неправильно
+                    // Просто сообщаем, что номер введён неправильно или номер не найден
                     if ("404".equals(String.valueOf(error.networkResponse.statusCode))) {
                         Log.i("asd123", String.valueOf(error.networkResponse.statusCode));
                         Toast.makeText(MainActivity.this, "Неправильно введён номер\nили нет информации о номере", Toast.LENGTH_LONG).show();
@@ -97,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
             etPhone.setText("");
             etPhone.setSelection(0);
         };
+
         bClear.setOnClickListener(clearClick);
         bSearch.setOnClickListener(searchClick);
     }
