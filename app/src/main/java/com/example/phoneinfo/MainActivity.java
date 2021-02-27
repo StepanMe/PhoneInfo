@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        this.setTitle("");
+        this.setTitle("Кто мне звонил");
 
         bSearch = findViewById(R.id.b_searchButton);
         etPhone = findViewById(R.id.et_phoneNumber);

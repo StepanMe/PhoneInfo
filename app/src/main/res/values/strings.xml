@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">PhoneInfo</string>
-    <string name="clear_button_caption">Очистить</string>
     <string name="phone_number_hint">Введите номер</string>
     <string name="search_button_caption">Кто звонил?</string>
 </resources>
