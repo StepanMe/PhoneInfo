@@ -37,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        this.setTitle("Кто мне звонил?");
+
         searchButton = findViewById(R.id.b_searchButton);
         phoneNumber = findViewById(R.id.et_phoneNumber);
         resultOperator = findViewById(R.id.tv_operator);
@@ -54,8 +56,8 @@ public class MainActivity extends AppCompatActivity {
                     Gson gson = gsonBuilder.create();
 
                     PhoneNumber p = gson.fromJson(response.toString(),PhoneNumber.class);
-                    resultOperator.setText(p.getOperator());
-                    resultRegion.setText(p.getRegion());
+                    resultOperator.setText("Оператор:" + p.getOperator());
+                    resultRegion.setText("Регион: " + p.getRegion());
 
 //                    Log.i("asd123", "Всё ОК: " + response.toString());
 
