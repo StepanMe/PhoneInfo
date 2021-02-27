@@ -1,18 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_margin="16dp"
-    android:gravity="center"
+    android:gravity="top|center"
     tools:context=".MainActivity">
 
     <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="200dp"
         android:gravity="center"
         android:orientation="vertical">
 
@@ -21,7 +19,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="@style/TextAppearance.AppCompat.Title"
-            tools:text="Оператор"/>
+            tools:text="Оператор:"/>
 
         <TextView
             android:id="@+id/tv_region"
@@ -34,44 +32,45 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="4"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         android:gravity="center|top">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="50dp"
-            android:orientation="horizontal">
-
-            <EditText
-                android:id="@+id/et_phoneNumber"
-                android:layout_width="0dp"
-                android:layout_weight="12"
+            <RelativeLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Введите номер"
-                android:inputType="phone"/>
+                android:orientation="horizontal">
 
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/floatingActionButton2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.1"
-                android:clickable="true"
-                app:backgroundTint="#dddddd"
-                app:fabSize="mini"
-                app:srcCompat="@android:drawable/ic_menu_close_clear_cancel" />
+                <EditText
+                    android:id="@+id/et_phoneNumber"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:layout_toStartOf="@+id/b_searchButton"
+                    android:textSize="24sp"
+                    android:hint="@string/phone_number_hint"
+                    android:inputType="phone"
+                    android:imeOptions="actionSearch"/>
 
+                <Button
+                    android:id="@+id/b_searchButton"
+                    android:layout_alignParentEnd="true"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="@android:drawable/ic_search_category_default"/>
 
-        </LinearLayout>
+                <Button
+                    android:id="@+id/b_clear"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/clear_button_caption"
+                    android:layout_below="@+id/b_searchButton"
+                    android:layout_centerHorizontal="true"
+                    android:backgroundTint="#cccccc"
+                    android:textColor="#eeeeee"
+                    android:layout_marginTop="10dp"/>
 
-        <Button
-            android:id="@+id/b_searchButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Найти"/>
-
+            </RelativeLayout>
 
     </LinearLayout>
 </LinearLayout>

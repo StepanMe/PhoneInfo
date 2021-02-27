@@ -6,10 +6,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.ClientError;
 import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -19,6 +19,7 @@ import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -27,25 +28,33 @@ import org.json.JSONObject;
 public class MainActivity extends AppCompatActivity {
     String phoneString;
 
-    TextView phoneNumber;
-    Button searchButton;
-    TextView resultOperator;
-    TextView resultRegion;
+    EditText etPhone;
+    Button bSearch;
+    Button bClear;
+    TextView tvOperator;
+    TextView tvRegion;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        this.setTitle("Кто мне звонил?");
+        this.setTitle("");
 
-        searchButton = findViewById(R.id.b_searchButton);
-        phoneNumber = findViewById(R.id.et_phoneNumber);
-        resultOperator = findViewById(R.id.tv_operator);
-        resultRegion = findViewById(R.id.tv_region);
+        bSearch = findViewById(R.id.b_searchButton);
+        etPhone = findViewById(R.id.et_phoneNumber);
+        tvOperator = findViewById(R.id.tv_operator);
+        tvRegion = findViewById(R.id.tv_region);
+        bClear = findViewById(R.id.b_clear);
+
+//        //Если в поле пусто, ставим в него курсор
+//        Log.i("asd123", String.valueOf(phoneNumber.getText().toString().length()));
+//        if (phoneNumber.getText().length() == 0){
+//            phoneNumber.setSelection(0);
+//        }
 
         View.OnClickListener searchClick = view -> {
-            phoneString = phoneNumber.getText().toString();
+            phoneString = etPhone.getText().toString();
             String requestUrl = "https://num.voxlink.ru/get/?num=" + phoneString.replaceAll("[^+0-9]","");
             RequestQueue requestQueue = Volley.newRequestQueue(this);
 
@@ -56,29 +65,39 @@ public class MainActivity extends AppCompatActivity {
                     Gson gson = gsonBuilder.create();
 
                     PhoneNumber p = gson.fromJson(response.toString(),PhoneNumber.class);
-                    resultOperator.setText("Оператор:" + p.getOperator());
-                    resultRegion.setText("Регион: " + p.getRegion());
-
-//                    Log.i("asd123", "Всё ОК: " + response.toString());
-
+                    tvOperator.setText(String.format("Оператор: %s",p.getOperator()));
+                    tvRegion.setText(String.format("Регион: %s",p.getRegion()));
                 }
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    if (error instanceof ClientError) {
-                        Toast.makeText(MainActivity.this,"Похоже, неправильно введён номер",Toast.LENGTH_LONG).show();
-                    }
-                    if (error instanceof TimeoutError) {
-//                        Log.i("asd123","Сервер  долго отвечает: " + error.toString());
-                    }
-                    if (error instanceof NoConnectionError || error instanceof ServerError) {
-                        Toast.makeText(MainActivity.this,"Нет соединения с интернетом/сервером",Toast.LENGTH_LONG).show();
-//                        Log.i("asd123","Нет соединения с сервером: " + error.toString());
+                    // TODO: обрабатывать ошибки 404, исходя из сообщения в JSON-поле "info" (неправильный формат номера или номер не найден)
+                    // Если сервер вернул ответ с кодом 404, то это не совсем ошибка
+                    // Просто сообщаем, что номер введён неправильно
+                    if ("404".equals(String.valueOf(error.networkResponse.statusCode))) {
+                        Log.i("asd123", String.valueOf(error.networkResponse.statusCode));
+                        Toast.makeText(MainActivity.this, "Неправильно введён номер\nили нет информации о номере", Toast.LENGTH_LONG).show();
+                    //Если что-то отличное от кода 404, действительно, какая-то ошибка
+                    } else {
+                        if (error instanceof TimeoutError) {
+                            Toast.makeText(MainActivity.this, "Сервер долго отвечает", Toast.LENGTH_LONG).show();
+                            Log.i("asd123", "Сервер  долго отвечает: " + error.toString());
+                        }
+                        if (error instanceof NoConnectionError || error instanceof ServerError) {
+                            Toast.makeText(MainActivity.this, "Нет соединения с интернетом", Toast.LENGTH_LONG).show();
+                            Log.i("asd123", "Нет соединения с сервером: " + error.toString());
+                        }
                     }
                 }
             });
             requestQueue.add(jsonObjectRequest);
         };
-        searchButton.setOnClickListener(searchClick);
+
+        View.OnClickListener clearClick = view -> {
+            etPhone.setText("");
+            etPhone.setSelection(0);
+        };
+        bClear.setOnClickListener(clearClick);
+        bSearch.setOnClickListener(searchClick);
     }
 }
