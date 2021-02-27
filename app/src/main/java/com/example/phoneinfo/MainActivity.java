@@ -46,12 +46,6 @@ public class MainActivity extends AppCompatActivity {
         tvRegion = findViewById(R.id.tv_region);
         bClear = findViewById(R.id.b_clear);
 
-//        //Если в поле пусто, ставим в него курсор
-//        Log.i("asd123", String.valueOf(phoneNumber.getText().toString().length()));
-//        if (phoneNumber.getText().length() == 0){
-//            phoneNumber.setSelection(0);
-//        }
-
         View.OnClickListener searchClick = view -> {
             phoneString = etPhone.getText().toString();
             String requestUrl = "https://num.voxlink.ru/get/?num=" + phoneString.replaceAll("[^+0-9]","");
@@ -93,6 +87,8 @@ public class MainActivity extends AppCompatActivity {
         };
 
         View.OnClickListener clearClick = view -> {
+            tvOperator.setText("");
+            tvRegion.setText("");
             etPhone.setText("");
             etPhone.setSelection(0);
         };
