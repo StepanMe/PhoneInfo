@@ -24,6 +24,8 @@ import com.google.gson.GsonBuilder;
 
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+
 public class MainActivity extends AppCompatActivity {
     String phoneString;
 
@@ -64,13 +66,34 @@ public class MainActivity extends AppCompatActivity {
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    // TODO: обрабатывать ошибки 404, исходя из сообщения в JSON-поле "info" (неправильный формат номера или номер не найден)
                     // Если сервер вернул ответ с кодом 404, то это не совсем ошибка
                     // Просто сообщаем, что номер введён неправильно или номер не найден
                     if ("404".equals(String.valueOf(error.networkResponse.statusCode))) {
-                        Log.i("asd123", String.valueOf(error.networkResponse.statusCode));
-                        Toast.makeText(MainActivity.this, "Неправильно введён номер\nили нет информации о номере", Toast.LENGTH_LONG).show();
-                    //Если что-то отличное от кода 404, действительно, какая-то ошибка
+                        String errResponseBody = null;
+                        try {
+                            //Пробуем преобразовать содержимое ответа сервера из массива byte'ов в строку
+                            errResponseBody = new String(error.networkResponse.data,"UTF-8");
+                        } catch (UnsupportedEncodingException e) {
+                            Toast.makeText(MainActivity.this, "Произошла ошибка при обработке ответа от сервера", Toast.LENGTH_LONG).show();
+                            Log.i("asd123","Ошибка при обработке содержимого ответа с кодом 404");
+                            e.printStackTrace();
+                        }
+
+                        GsonBuilder gsonBuilder = new GsonBuilder();
+                        Gson gson = gsonBuilder.create();
+                        // Готовим сообщение для тоста
+                        String toastMessage;
+                        PhoneError phoneError = gson.fromJson(errResponseBody,PhoneError.class);
+                        switch (phoneError.ErrorType()) {
+                            case "PHONE_NOT_FOUND": toastMessage = "Номер не найден.\nПроверьте код города";
+                                break;
+                            case "WRONG_PHONE_FORMAT": toastMessage = "Неверный формат номера";
+                                break;
+                            default: toastMessage = "Неправильно введён номер,\nили номер не найден";
+                        }
+                        Toast.makeText(MainActivity.this, toastMessage, Toast.LENGTH_LONG).show();
+                        Log.i("asd123","Содержимое ответа: " + errResponseBody);
+                    //Если код ответа отличается от 404, действительно, какая-то ошибка
                     } else {
                         if (error instanceof TimeoutError) {
                             Toast.makeText(MainActivity.this, "Сервер долго отвечает", Toast.LENGTH_LONG).show();
