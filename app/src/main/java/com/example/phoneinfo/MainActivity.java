@@ -50,6 +50,10 @@ public class MainActivity extends AppCompatActivity {
 
         View.OnClickListener searchClick = view -> {
             phoneString = etPhone.getText().toString();
+            if (phoneString.length() == 0) {
+                Toast.makeText(this,"Введите номер телефона\nв формате +7XXXXXXXXXX",Toast.LENGTH_LONG).show();
+                return;
+            }
             String requestUrl = "https://num.voxlink.ru/get/?num=" + phoneString.replaceAll("[^+0-9]","");
             RequestQueue requestQueue = Volley.newRequestQueue(this);
 

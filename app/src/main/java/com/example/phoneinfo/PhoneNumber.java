@@ -2,7 +2,6 @@ package com.example.phoneinfo;
 
 public class PhoneNumber {
 
-    private String info;
     private String code;
     private String num;
     private String full_num;
@@ -51,10 +50,6 @@ public class PhoneNumber {
 
     public String getOldOperator(){
         return this.old_operator;
-    }
-
-    public boolean hasInfoField(){
-        return (this.info != null);
     }
 
     public boolean isPorted(){
