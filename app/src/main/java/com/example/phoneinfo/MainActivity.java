@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        this.setTitle("Кто мне звонил");
+        this.setTitle(getString(R.string.main_activity_title));
 
         bSearch = findViewById(R.id.b_searchButton);
         etPhone = findViewById(R.id.et_phoneNumber);
@@ -64,8 +64,8 @@ public class MainActivity extends AppCompatActivity {
                     Gson gson = gsonBuilder.create();
 
                     PhoneNumber p = gson.fromJson(response.toString(),PhoneNumber.class);
-                    tvOperator.setText(String.format("Оператор: %s",p.getOperator()));
-                    tvRegion.setText(String.format("Регион: %s",p.getRegion()));
+                    tvOperator.setText(String.format(getString(R.string.tv_operator_title),p.getOperator()));
+                    tvRegion.setText(String.format(getString(R.string.tv_region_title),p.getRegion()));
                 }
             }, new Response.ErrorListener() {
                 @Override
@@ -89,24 +89,29 @@ public class MainActivity extends AppCompatActivity {
                         String toastMessage;
                         PhoneError phoneError = gson.fromJson(errResponseBody,PhoneError.class);
                         switch (phoneError.ErrorType()) {
-                            case "PHONE_NOT_FOUND": toastMessage = "Номер не найден.\nПроверьте код города";
+                            case "PHONE_NOT_FOUND": toastMessage = getString(R.string.error_phone_not_found);
                                 break;
-                            case "WRONG_PHONE_FORMAT": toastMessage = "Неверный формат номера";
+                            case "WRONG_PHONE_FORMAT": toastMessage = getString(R.string.error_wrong_phone_format);
                                 break;
-                            default: toastMessage = "Неправильно введён номер,\nили номер не найден";
+                            default: toastMessage = getString(R.string.error_wrong_format_or_not_found);
                         }
                         Toast.makeText(MainActivity.this, toastMessage, Toast.LENGTH_LONG).show();
                         Log.i("asd123","Содержимое ответа: " + errResponseBody);
                     //Если код ответа отличается от 404, действительно, какая-то ошибка
                     } else {
+                        String toastMessage = null;
                         if (error instanceof TimeoutError) {
-                            Toast.makeText(MainActivity.this, "Сервер долго отвечает", Toast.LENGTH_LONG).show();
+                            toastMessage = getString(R.string.error_server_response_timeout);
+//                            Toast.makeText(MainActivity.this, "Сервер долго отвечает", Toast.LENGTH_LONG).show();
                             Log.i("asd123", "Сервер  долго отвечает: " + error.toString());
-                        }
-                        if (error instanceof NoConnectionError || error instanceof ServerError) {
-                            Toast.makeText(MainActivity.this, "Нет соединения с интернетом", Toast.LENGTH_LONG).show();
+                        } else if (error instanceof NoConnectionError || error instanceof ServerError) {
+                            toastMessage = getString(R.string.error_no_internet_connection);
+//                            Toast.makeText(MainActivity.this, "Нет соединения с интернетом", Toast.LENGTH_LONG).show();
                             Log.i("asd123", "Нет соединения с сервером: " + error.toString());
+                        } else {
+                            toastMessage = getString(R.string.error_unknown);
                         }
+                        Toast.makeText(MainActivity.this, toastMessage, Toast.LENGTH_LONG).show();
                     }
                 }
             });

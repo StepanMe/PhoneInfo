@@ -1,5 +1,14 @@
 <resources>
     <string name="app_name">PhoneInfo</string>
+    <string name="main_activity_title">Кто мне звонил</string>
     <string name="phone_number_hint">Введите номер</string>
     <string name="search_button_caption">Кто звонил?</string>
+    <string name="tv_operator_title">Оператор: %s</string>
+    <string name="tv_region_title">Регион: %s</string>
+    <string name="error_phone_not_found">Номер не найден.\nПроверьте код города</string>
+    <string name="error_wrong_phone_format">Неверный формат номера</string>
+    <string name="error_wrong_format_or_not_found">Неправильно введён номер,\nили номер не найден</string>
+    <string name="error_server_response_timeout">Сервер долго отвечает</string>
+    <string name="error_no_internet_connection">Нет соединения с интернетом</string>
+    <string name="error_unknown">Произошла ошибка.\nПопробуйте сделать запрос позднее</string>
 </resources>
