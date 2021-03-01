@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,13 +26,14 @@ import com.google.gson.GsonBuilder;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 public class MainActivity extends AppCompatActivity {
     String phoneString;
 
     EditText etPhone;
     Button bSearch;
-    Button bClear;
+    ImageButton bClear;
     TextView tvOperator;
     TextView tvRegion;
 
@@ -51,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
         View.OnClickListener searchClick = view -> {
             phoneString = etPhone.getText().toString();
             if (phoneString.length() == 0) {
-                Toast.makeText(this,"Введите номер телефона\nв формате +7XXXXXXXXXX",Toast.LENGTH_LONG).show();
+                Toast.makeText(this,R.string.toast_error_enter_correct_phone,Toast.LENGTH_LONG).show();
                 return;
             }
             String requestUrl = "https://num.voxlink.ru/get/?num=" + phoneString.replaceAll("[^+0-9]","");
@@ -74,14 +76,8 @@ public class MainActivity extends AppCompatActivity {
                     // Просто сообщаем, что номер введён неправильно или номер не найден
                     if ("404".equals(String.valueOf(error.networkResponse.statusCode))) {
                         String errResponseBody = null;
-                        try {
-                            //Пробуем преобразовать содержимое ответа сервера из массива byte'ов в строку
-                            errResponseBody = new String(error.networkResponse.data,"UTF-8");
-                        } catch (UnsupportedEncodingException e) {
-                            Toast.makeText(MainActivity.this, "Произошла ошибка при обработке ответа от сервера", Toast.LENGTH_LONG).show();
-                            Log.i("asd123","Ошибка при обработке содержимого ответа с кодом 404");
-                            e.printStackTrace();
-                        }
+                        //Пробуем преобразовать содержимое ответа сервера из массива byte'ов в строку
+                        errResponseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
 
                         GsonBuilder gsonBuilder = new GsonBuilder();
                         Gson gson = gsonBuilder.create();
@@ -89,27 +85,28 @@ public class MainActivity extends AppCompatActivity {
                         String toastMessage;
                         PhoneError phoneError = gson.fromJson(errResponseBody,PhoneError.class);
                         switch (phoneError.ErrorType()) {
-                            case "PHONE_NOT_FOUND": toastMessage = getString(R.string.error_phone_not_found);
+                            case "PHONE_NOT_FOUND": toastMessage = getString(R.string.toast_error_phone_not_found);
                                 break;
-                            case "WRONG_PHONE_FORMAT": toastMessage = getString(R.string.error_wrong_phone_format);
+                            case "WRONG_PHONE_FORMAT": toastMessage = getString(R.string.toast_error_wrong_phone_format);
                                 break;
-                            default: toastMessage = getString(R.string.error_wrong_format_or_not_found);
+                            default: toastMessage = getString(R.string.toast_error_wrong_format_or_not_found);
                         }
                         Toast.makeText(MainActivity.this, toastMessage, Toast.LENGTH_LONG).show();
                         Log.i("asd123","Содержимое ответа: " + errResponseBody);
-                    //Если код ответа отличается от 404, действительно, какая-то ошибка
+                    // Если код ответа отличается от 404, действительно, какая-то ошибка
+                    // Сообщаем об этом пользователю
                     } else {
-                        String toastMessage = null;
+                        String toastMessage;
                         if (error instanceof TimeoutError) {
-                            toastMessage = getString(R.string.error_server_response_timeout);
+                            toastMessage = getString(R.string.toast_error_server_response_timeout);
 //                            Toast.makeText(MainActivity.this, "Сервер долго отвечает", Toast.LENGTH_LONG).show();
                             Log.i("asd123", "Сервер  долго отвечает: " + error.toString());
                         } else if (error instanceof NoConnectionError || error instanceof ServerError) {
-                            toastMessage = getString(R.string.error_no_internet_connection);
+                            toastMessage = getString(R.string.toast_error_no_internet_connection);
 //                            Toast.makeText(MainActivity.this, "Нет соединения с интернетом", Toast.LENGTH_LONG).show();
                             Log.i("asd123", "Нет соединения с сервером: " + error.toString());
                         } else {
-                            toastMessage = getString(R.string.error_unknown);
+                            toastMessage = getString(R.string.toast_error_unknown);
                         }
                         Toast.makeText(MainActivity.this, toastMessage, Toast.LENGTH_LONG).show();
                     }
