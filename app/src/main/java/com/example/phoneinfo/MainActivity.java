@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
                     // Просто сообщаем, что номер введён неправильно или номер не найден
                     if ("404".equals(String.valueOf(error.networkResponse.statusCode))) {
                         String errResponseBody;
-                        //Преобразуем содержимое ответа сервера из массива byte'ов в строку
+                        // Преобразуем содержимое ответа сервера из массива byte'ов в строку
                         errResponseBody = new String(error.networkResponse.data, StandardCharsets.UTF_8);
 
                         GsonBuilder gsonBuilder = new GsonBuilder();
@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
 
                         Log.i("asd123","Содержимое ответа: " + errResponseBody);
                     // Если код ответа отличается от 404, действительно, какая-то ошибка
-                    // Сообщаем об этом пользователю
+                    // Выявляем её и сообщаем пользователю
                     } else {
                         String toastMessage;
                         if (error instanceof TimeoutError) {
