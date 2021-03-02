@@ -51,6 +51,7 @@
                 android:hint="@string/phone_number_hint"
                 android:imeOptions="actionSearch"
                 android:inputType="phone"
+                android:singleLine="true"
                 android:textSize="24sp"
                 android:importantForAutofill="no"/>
 
