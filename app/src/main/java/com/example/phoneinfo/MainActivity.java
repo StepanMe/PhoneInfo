@@ -31,6 +31,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
+import ru.tinkoff.decoro.MaskImpl;
+import ru.tinkoff.decoro.slots.PredefinedSlots;
+import ru.tinkoff.decoro.watchers.FormatWatcher;
+import ru.tinkoff.decoro.watchers.MaskFormatWatcher;
+
 public class MainActivity extends AppCompatActivity {
     String phoneString;
 
@@ -48,11 +53,19 @@ public class MainActivity extends AppCompatActivity {
 
         this.setTitle(getString(R.string.main_activity_title));
 
-        bSearch = findViewById(R.id.b_searchButton);
-        etPhone = findViewById(R.id.et_phoneNumber);
         tvOperator = findViewById(R.id.tv_operator);
         tvRegion = findViewById(R.id.tv_region);
         bClear = findViewById(R.id.b_clear);
+        bSearch = findViewById(R.id.b_searchButton);
+        etPhone = findViewById(R.id.et_phoneNumber);
+
+        // Добавляем маску и "случатель" на поле ввода номера
+        MaskImpl mask = MaskImpl.createTerminated(PredefinedSlots.RUS_PHONE_NUMBER);
+        FormatWatcher watcher = new MaskFormatWatcher(mask);
+        watcher.installOnAndFill(etPhone);
+
+        //Ставим курсор в поле ввода номера
+        etPhone.requestFocus();
 
         View.OnClickListener searchClick = view -> {
             // Скрываем клавиатуру

@@ -53,6 +53,7 @@
                 android:inputType="phone"
                 android:singleLine="true"
                 android:textSize="24sp"
+                android:focusable="true"
                 android:importantForAutofill="no"/>
 
             <ImageButton
