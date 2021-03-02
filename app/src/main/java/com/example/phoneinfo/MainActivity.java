@@ -5,7 +5,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -50,14 +52,13 @@ public class MainActivity extends AppCompatActivity {
         tvRegion = findViewById(R.id.tv_region);
         bClear = findViewById(R.id.b_clear);
 
-
         View.OnClickListener searchClick = view -> {
             // Скрываем клавиатуру
             InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-            inputMethodManager.hideSoftInputFromWindow(bSearch.getWindowToken(),inputMethodManager.HIDE_NOT_ALWAYS);
+            inputMethodManager.hideSoftInputFromWindow(bSearch.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
 
             // Очищаем строку с номером телефона от ненужных символов, оставляем только цифры
-            phoneString = etPhone.getText().toString().replaceAll("[^0-9]","");;
+            phoneString = etPhone.getText().toString().replaceAll("[^0-9]","");
             // Если строка пустая, просим пользователя ввести номер телефона
             if (phoneString.length() == 0) {
                 Toast.makeText(this,R.string.toast_error_enter_correct_phone,Toast.LENGTH_LONG).show();
@@ -141,7 +142,21 @@ public class MainActivity extends AppCompatActivity {
             inputMethodManager.showSoftInput(etPhone,0);
         };
 
+        // Вешаем события на кнопки
         bClear.setOnClickListener(clearClick);
         bSearch.setOnClickListener(searchClick);
+
+        // Добавляем прослушку нажатия кнопки на виртуальной клавиатуре
+        // Если нажата кнопка Поиск, начинаем искать
+        etPhone.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                // IME_ACTION_SEARCH = 3
+                if (i == EditorInfo.IME_ACTION_SEARCH) {
+                    searchClick.onClick(etPhone);
+                }
+                return false;
+            }
+        });
     }
 }
