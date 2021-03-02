@@ -10,9 +10,9 @@ public class PhoneError {
     }
 
     public String ErrorType() {
-        if (this.info.contains("Номер не найден. Проверьте код города") == true) {
+        if (this.info.contains("Номер не найден. Проверьте код города")) {
             return "PHONE_NOT_FOUND";
-        } else if (this.info.contains("Неверный формат номера") == true) {
+        } else if (this.info.contains("Неверный формат номера")) {
             return "WRONG_PHONE_FORMAT";
         } else {
             return "WRONG_OR_NOT_FOUND";

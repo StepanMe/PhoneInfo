@@ -28,6 +28,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.json.JSONObject;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
     String phoneString;
@@ -127,7 +129,15 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(MainActivity.this, toastMessage, Toast.LENGTH_LONG).show();
                     }
                 }
-            });
+            }) {
+                @Override
+                public Map<String,String> getHeaders() {
+                    Map<String,String> params = new HashMap ();
+                    params.put("User-Agent ","PhoneInfo by Stepan Mednikov (x-steff@mail.ru)");
+                    return params;
+                }
+            };
+
             requestQueue.add(jsonObjectRequest);
         };
 
