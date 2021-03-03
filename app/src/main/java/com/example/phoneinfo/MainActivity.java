@@ -12,9 +12,11 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.NoConnectionError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -26,11 +28,11 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
 import org.json.JSONObject;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
-
 import ru.tinkoff.decoro.MaskImpl;
 import ru.tinkoff.decoro.slots.PredefinedSlots;
 import ru.tinkoff.decoro.watchers.FormatWatcher;
@@ -39,6 +41,7 @@ import ru.tinkoff.decoro.watchers.MaskFormatWatcher;
 public class MainActivity extends AppCompatActivity {
     String phoneString;
 
+    ProgressBar progressBar;
     TextView tvOperator;
     TextView tvRegion;
 
@@ -58,19 +61,29 @@ public class MainActivity extends AppCompatActivity {
         bClear = findViewById(R.id.b_clear);
         bSearch = findViewById(R.id.b_searchButton);
         etPhone = findViewById(R.id.et_phoneNumber);
+        progressBar = findViewById(R.id.progress_bar);
 
-        // Добавляем маску и "случатель" на поле ввода номера
+        // Добавляем маску и "слушатель" на поле ввода номера
         MaskImpl mask = MaskImpl.createTerminated(PredefinedSlots.RUS_PHONE_NUMBER);
         FormatWatcher watcher = new MaskFormatWatcher(mask);
         watcher.installOnAndFill(etPhone);
 
-        //Ставим курсор в поле ввода номера
+        //Ставим курсор в поле ввода номера при запуске приложения
         etPhone.requestFocus();
 
         View.OnClickListener searchClick = view -> {
+
+            // Прячем курсор
+            etPhone.clearFocus();
+            // Очищаем результаты предыдущего, возможно, корректного запроса
+            tvOperator.setText("");
+            tvRegion.setText("");
+            // Показываем прогресс-бар
+            progressBar.setVisibility(View.VISIBLE);
+
             // Скрываем клавиатуру
             InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-            inputMethodManager.hideSoftInputFromWindow(bSearch.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+            inputMethodManager.hideSoftInputFromWindow(bSearch.getWindowToken(), InputMethodManager.RESULT_HIDDEN);
 
             // Очищаем строку с номером телефона от ненужных символов, оставляем только цифры
             phoneString = etPhone.getText().toString().replaceAll("[^0-9]","");
@@ -89,8 +102,10 @@ public class MainActivity extends AppCompatActivity {
                 public void onResponse(JSONObject response) {
                     GsonBuilder gsonBuilder = new GsonBuilder();
                     Gson gson = gsonBuilder.create();
-
                     PhoneNumber p = gson.fromJson(response.toString(),PhoneNumber.class);
+                    // Скрываем прогресс-бар
+                    progressBar.setVisibility(View.INVISIBLE);
+                    // Выводим полученный текст
                     tvOperator.setText(String.format(getString(R.string.tv_operator_title),p.getOperator()));
                     tvRegion.setText(String.format(getString(R.string.tv_region_title),p.getRegion()));
                 }
@@ -107,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
 
                         GsonBuilder gsonBuilder = new GsonBuilder();
                         Gson gson = gsonBuilder.create();
-                        // Готовим текст сообщения для Toast'а
+                        // Если возникла  ошибка, готовим текст сообщения для Toast'а
                         String toastMessage;
                         PhoneError phoneError = gson.fromJson(errResponseBody,PhoneError.class);
                         switch (phoneError.ErrorType()) {
@@ -117,13 +132,8 @@ public class MainActivity extends AppCompatActivity {
                                 break;
                             default: toastMessage = getString(R.string.toast_error_wrong_format_or_not_found);
                         }
-
+                        // Сообщаем...
                         Toast.makeText(MainActivity.this, toastMessage, Toast.LENGTH_LONG).show();
-
-                        // Если возникла такая ошибка, очищаем результаты возможного предыдущего корректного запроса
-                        tvOperator.setText("");
-                        tvRegion.setText("");
-
                         Log.i("asd123","Содержимое ответа: " + errResponseBody);
                     // Если код ответа отличается от 404, действительно, какая-то ошибка
                     // Выявляем её и сообщаем пользователю
@@ -144,13 +154,14 @@ public class MainActivity extends AppCompatActivity {
                 }
             }) {
                 @Override
-                public Map<String,String> getHeaders() {
-                    Map<String,String> params = new HashMap ();
-                    params.put("User-Agent ","PhoneInfo by Stepan Mednikov (x-steff@mail.ru)");
+                public Map<String,String> getHeaders() throws AuthFailureError {
+                    Map<String,String> params = new HashMap();
+                    params.put("User-Agent","PhoneInfo; Author: github.com/StepanMe/");
+                    params.put("Accept","application/json");
+                    params.put("accept-language","ru-RU,ru");
                     return params;
                 }
             };
-
             requestQueue.add(jsonObjectRequest);
         };
 
@@ -159,10 +170,13 @@ public class MainActivity extends AppCompatActivity {
             tvOperator.setText("");
             tvRegion.setText("");
             etPhone.setText("");
+            // Вставляем курсор в конец строки
+            etPhone.requestFocus();
+            etPhone.setSelection(etPhone.getText().toString().length());
 
             // Показываем клавиатуру
             InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-            inputMethodManager.showSoftInput(etPhone,0);
+            inputMethodManager.showSoftInput(etPhone,InputMethodManager.RESULT_SHOWN);
         };
 
         // Вешаем события на кнопки
@@ -170,7 +184,7 @@ public class MainActivity extends AppCompatActivity {
         bSearch.setOnClickListener(searchClick);
 
         // Добавляем прослушку нажатия кнопки на виртуальной клавиатуре
-        // Если нажата кнопка Поиск, начинаем искать
+        // Если нажата кнопка Поиск...
         etPhone.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
