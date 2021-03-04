@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
 
             // Скрываем клавиатуру
             InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-            inputMethodManager.hideSoftInputFromWindow(bSearch.getWindowToken(), InputMethodManager.RESULT_HIDDEN);
+            inputMethodManager.hideSoftInputFromWindow(etPhone.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
 
             // Очищаем строку с номером телефона от ненужных символов, оставляем только цифры
             phoneString = etPhone.getText().toString().replaceAll("[^0-9]","");
@@ -113,6 +113,7 @@ public class MainActivity extends AppCompatActivity {
                 // В случае ошибки
                 @Override
                 public void onErrorResponse(VolleyError error) {
+                    progressBar.setVisibility(View.INVISIBLE);
                     // Если сервер вернул ответ с кодом 404, то это не совсем ошибка
                     // Просто сообщаем, что номер введён неправильно или номер не найден
                     if ("404".equals(String.valueOf(error.networkResponse.statusCode))) {
@@ -176,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
 
             // Показываем клавиатуру
             InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-            inputMethodManager.showSoftInput(etPhone,InputMethodManager.RESULT_SHOWN);
+            inputMethodManager.showSoftInput(etPhone,InputMethodManager.SHOW_FORCED);
         };
 
         // Вешаем события на кнопки
